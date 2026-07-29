@@ -168,7 +168,24 @@
         <p style="text-align: center; color: #64748b; padding: 10px; font-size: 12px;">กำลังโหลดประวัติ...</p>
       </div>
     </div>
+<div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+  <p style="color: #fff; font-size: 14px; margin-bottom: 8px;">🗑️ ล้างข้อมูลเฉพาะรายการ:</p>
+  
+  <!-- Dropdown หรือช่องกรอก Line / ชนิดน้ำมัน -->
+  <select id="clearTargetSelect" style="width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 4px; background: #2b303b; color: #fff; border: 1px solid #444;">
+    <option value="">-- เลือกชนิดน้ำมัน หรือ เครื่องจักร/Line --</option>
+    <option value="น้ำมันมะพร้าว">น้ำมันมะพร้าว</option>
+    <option value="น้ำมันกันสนิม">น้ำมันกันสนิม</option>
+    <option value="น้ำมัน SS75 คอลล่า">น้ำมัน SS75 คอลล่า</option>
+    <option value="น้ำมันขึ้นรูป Stamping">น้ำมันขึ้นรูป Stamping</option>
+    <option value="น้ำมัน HP TC">น้ำมัน HP TC</option>
+    <!-- หรือสามารถใส่ชื่อ Line เช่น MC-01, แผนกปั๊ม ได้ตามต้องการ -->
+  </select>
 
+  <button type="button" onclick="clearSpecificDataWithPassword()" style="width: 100%; padding: 10px; background-color: #ff9800; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+    🔒 ล้างข้อมูลเฉพาะที่เลือก (ต้องใส่รหัสผ่าน)
+  </button>
+</div>
     <!-- Danger Zone (ล้างข้อมูล) -->
     <div class="danger-zone">
       <div class="dashboard-title" style="color: #fca5a5; margin-bottom: 8px;">⚠️ การจัดการระบบ (System Management)</div>
