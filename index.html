@@ -142,14 +142,15 @@
       </div>
     </div>
 
+    <!-- ช่องกรอกสลับตามโหมดการรับ/จ่าย -->
     <div class="form-group">
-      <label>เครื่องจักร / แผนกที่รับไปใช้</label>
-      <input type="text" class="form-control" id="destinationInput" placeholder="เช่น MC-01, แผนกปั๊ม">
+      <label id="lblDestination">Line / เครื่องจักรที่รับไปใช้</label>
+      <input type="text" class="form-control" id="destinationInput" placeholder="เช่น Line 1, MC-01">
     </div>
 
     <div class="form-group">
-      <label>ผู้ทำรายการ / Operator</label>
-      <input type="text" class="form-control" id="operatorInput" placeholder="ชื่อผู้เบิกหรือช่าง">
+      <label id="lblOperator">ผู้เบิก</label>
+      <input type="text" class="form-control" id="operatorInput" placeholder="ชื่อผู้เบิกน้ำมัน">
     </div>
 
     <button class="btn-submit" onclick="submitTransaction()">☁️ บันทึกรายการลง Cloud</button>
@@ -163,14 +164,14 @@
     </div>
   </div>
 
-  <!-- การจัดการระบบ (System Management - ล้างข้อมูลพร้อมรหัสผ่าน) -->
+  <!-- การจัดการระบบ (System Management) -->
   <div class="admin-card">
     <div class="admin-title">⚠️ การจัดการระบบ (System Management)</div>
     
     <div style="margin-bottom: 8px;">
-      <label style="font-size: 11px; color: #cbd5e1; display: block; margin-bottom: 4px;">ล้างข้อมูลเฉพาะชนิดน้ำมัน หรือ Line/เครื่องจักร:</label>
+      <label style="font-size: 11px; color: #cbd5e1; display: block; margin-bottom: 4px;">ล้างข้อมูลเฉพาะชนิดน้ำมัน หรือ Line/เครื่องจักร/Supplier:</label>
       <div class="admin-input-group">
-        <input type="text" id="targetDeleteInput" class="form-control" placeholder="ระบุ เช่น น้ำมันมะพร้าว หรือ MC-01">
+        <input type="text" id="targetDeleteInput" class="form-control" placeholder="ระบุ เช่น น้ำมันมะพร้าว หรือ Line 1">
         <button class="btn-clear-specific" onclick="clearSpecificDataWithPassword()">🔒 ลบรายการนี้</button>
       </div>
     </div>
@@ -192,13 +193,25 @@
     currentMode = mode;
     const btnOut = document.getElementById('btn-mode-out');
     const btnIn = document.getElementById('btn-mode-in');
+    const lblDestination = document.getElementById('lblDestination');
+    const lblOperator = document.getElementById('lblOperator');
+    const destinationInput = document.getElementById('destinationInput');
+    const operatorInput = document.getElementById('operatorInput');
     
     if (mode === 'OUT') {
       btnOut.className = 'tab-btn active-out';
       btnIn.className = 'tab-btn inactive';
+      lblDestination.innerText = 'Line / เครื่องจักรที่รับไปใช้';
+      destinationInput.placeholder = 'เช่น Line 1, MC-01';
+      lblOperator.innerText = 'ผู้เบิก';
+      operatorInput.placeholder = 'ชื่อผู้เบิกน้ำมัน';
     } else {
       btnIn.className = 'tab-btn active-in';
       btnOut.className = 'tab-btn inactive';
+      lblDestination.innerText = 'ชื่อ Supplier';
+      destinationInput.placeholder = 'เช่น PTT, Shell, Sansiam';
+      lblOperator.innerText = 'ผู้รับน้ำมัน';
+      operatorInput.placeholder = 'ชื่อผู้รับน้ำมันเข้า Store';
     }
   }
 
@@ -241,6 +254,8 @@
       if (result.status === "success") {
         alert("บันทึกข้อมูลเรียบร้อยแล้ว");
         document.getElementById('qtyInput').value = "0.00";
+        document.getElementById('destinationInput').value = "";
+        document.getElementById('operatorInput').value = "";
         fetchData(); // ดึงข้อมูลใหม่เพื่ออัปเดตสต็อกทันที
       } else {
         alert("เกิดข้อผิดพลาด: " + result.message);
@@ -341,7 +356,7 @@
   async function clearSpecificDataWithPassword() {
     const targetVal = document.getElementById("targetDeleteInput").value.trim();
     if (!targetVal) {
-      alert("กรุณาระบุชนิดน้ำมัน หรือ Line/เครื่องจักร ที่ต้องการลบก่อนครับ");
+      alert("กรุณาระบุชนิดน้ำมัน หรือ Line/เครื่องจักร/Supplier ที่ต้องการลบก่อนครับ");
       return;
     }
 
@@ -366,7 +381,7 @@
       const result = await res.json();
       if (result.status === 'success') {
         alert(`ลบข้อมูล "${targetVal}" เรียบร้อยแล้ว`);
-        fetchData(); // โหลดและคำนวณยอดใหม่
+        fetchData();
       } else {
         alert("ไม่สามารถลบได้: " + result.message);
       }
@@ -397,7 +412,7 @@
       const result = await res.json();
       if (result.status === 'success') {
         alert("ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว");
-        fetchData(); // รีเซ็ตยอดแสดงผลเป็น 0
+        fetchData();
       } else {
         alert("ไม่สามารถลบได้: " + result.message);
       }
