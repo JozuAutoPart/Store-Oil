@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oil Store Mobile - ระบบควบคุมสต็อกน้ำมัน</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #0f172a; color: #f8fafc; padding: 15px; display: flex; justify-content: center; }
@@ -25,6 +27,10 @@
     
     /* Card Full Width for HP TC */
     .stock-card.full-width { grid-column: span 2; }
+
+    /* Chart Card */
+    .chart-card { background: #1e293b; border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid #334155; }
+    .chart-container { position: relative; width: 100%; height: 260px; margin-top: 10px; }
 
     /* Form Section */
     .form-card { background: #1e293b; border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid #334155; }
@@ -111,6 +117,14 @@
     </div>
   </div>
 
+  <!-- 📈 ส่วนแสดงกราฟการใช้น้ำมันแต่ละเดือน แยกตาม Line -->
+  <div class="chart-card">
+    <div class="section-title">📈 ปริมาณการใช้น้ำมันประจำเดือน (แยกตาม Line)</div>
+    <div class="chart-container">
+      <canvas id="monthlyLineChart"></canvas>
+    </div>
+  </div>
+
   <!-- ฟอร์มลงบันทึก รับเข้า / จ่ายออก -->
   <div class="form-card">
     <div class="section-title" style="margin-bottom: 12px;">📑 ลงบันทึก รับเข้า / จ่ายออก</div>
@@ -142,7 +156,6 @@
       </div>
     </div>
 
-    <!-- ช่องกรอกสลับตามโหมดการรับ/จ่าย -->
     <div class="form-group">
       <label id="lblDestination">Line / เครื่องจักรที่รับไปใช้</label>
       <input type="text" class="form-control" id="destinationInput" placeholder="เช่น Line 1, MC-01">
@@ -188,6 +201,7 @@
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQBXdSHpcCXa5hM2asS-9w1xEwXVoPuuRUHCsjNR1k9zEKCdILqT8OslxxWsJsLVV0/exec"; 
   
   let currentMode = 'OUT'; // ค่าเริ่มต้น: จ่ายออก
+  let lineChartInstance = null; // ตัวแปรเก็บ Object กราฟ
 
   function setMode(mode) {
     currentMode = mode;
@@ -256,7 +270,7 @@
         document.getElementById('qtyInput').value = "0.00";
         document.getElementById('destinationInput').value = "";
         document.getElementById('operatorInput').value = "";
-        fetchData(); // ดึงข้อมูลใหม่เพื่ออัปเดตสต็อกทันที
+        fetchData(); 
       } else {
         alert("เกิดข้อผิดพลาด: " + result.message);
       }
@@ -265,7 +279,7 @@
     }
   }
 
-  // --- 2. ดึงข้อมูลและคำนวณยอดสต็อกคงเหลือ ---
+  // --- 2. ดึงข้อมูลและคำนวณยอดสต็อกคงเหลือ + วาดกราฟ ---
   async function fetchData() {
     try {
       const res = await fetch(`${SCRIPT_URL}?module=oil`);
@@ -304,6 +318,9 @@
 
       // แสดงประวัติล่าสุด
       renderLogHistory(logs);
+
+      // สร้างและอัปเดตกราฟการใช้น้ำมันแต่ละเดือน แยกตาม Line
+      renderMonthlyLineChart(logs);
 
     } catch (err) {
       console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
@@ -350,6 +367,103 @@
     });
 
     container.innerHTML = html;
+  }
+
+  // --- 📈 ฟังก์ชันประมวลผลและสร้างกราฟประจำเดือนแยกตาม Line ---
+  function renderMonthlyLineChart(logs) {
+    if (!Array.isArray(logs) || logs.length === 0) return;
+
+    const monthlyData = {}; // { "ม.ค. 2026": { "Line 1": 50, "Line 2": 30 } }
+    const linesSet = new Set();
+    const monthsSet = new Set();
+
+    // กรองเฉพาะรายการจ่ายออก (OUT)
+    logs.forEach(item => {
+      const isOut = item.type === 'OUT' || item.type === 'จ่ายออก';
+      if (isOut && item.timestamp && item.destination) {
+        // ดึงเดือน/ปี จาก timestamp (รองรับรูปแบบ 29/7/2569 หรือ YYYY-MM-DD)
+        let monthKey = '';
+        const parts = item.timestamp.split(' ')[0].split('/');
+        if (parts.length >= 3) {
+          const monthNames = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+          const mIdx = parseInt(parts[1], 10) - 1;
+          const monthStr = monthNames[mIdx] || parts[1];
+          monthKey = `${monthStr} ${parts[2]}`;
+        } else {
+          monthKey = 'เดือนปัจจุบัน';
+        }
+
+        const lineName = item.destination.trim() || 'ไม่ระบุ Line';
+        const qty = Number(item.qty) || 0;
+
+        monthsSet.add(monthKey);
+        linesSet.add(lineName);
+
+        if (!monthlyData[monthKey]) monthlyData[monthKey] = {};
+        if (!monthlyData[monthKey][lineName]) monthlyData[monthKey][lineName] = 0;
+        monthlyData[monthKey][lineName] += qty;
+      }
+    });
+
+    const labels = Array.from(monthsSet); // เดือนบนแกน X
+    const lines = Array.from(linesSet);   // รายชื่อ Line ทั้งหมด
+
+    // พาเลตสีสวยงามสำหรับแต่ละ Line
+    const colorPalette = [
+      '#38bdf8', '#f43f5e', '#10b981', '#fbbf24', 
+      '#a855f7', '#ec4899', '#3b82f6', '#14b8a6'
+    ];
+
+    // สร้าง Dataset สำหรับ Chart.js
+    const datasets = lines.map((line, index) => {
+      return {
+        label: line,
+        data: labels.map(m => monthlyData[m][line] || 0),
+        backgroundColor: colorPalette[index % colorPalette.length],
+        borderRadius: 4
+      };
+    });
+
+    const ctx = document.getElementById('monthlyLineChart').getContext('2d');
+
+    // ถ้ามีกราฟเดิมอยู่ให้ทำลายก่อนวาดใหม่
+    if (lineChartInstance) {
+      lineChartInstance.destroy();
+    }
+
+    lineChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { color: '#cbd5e1', font: { size: 11 } }
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.dataset.label}: ${ctx.raw} ลิตร`
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            ticks: { color: '#94a3b8', font: { size: 10 } },
+            grid: { color: '#334155' }
+          },
+          y: {
+            stacked: true,
+            ticks: { color: '#94a3b8', font: { size: 10 } },
+            grid: { color: '#334155' }
+          }
+        }
+      }
+    });
   }
 
   // --- 3. 🔒 ลบข้อมูลเฉพาะรายการ (ใส่รหัสผ่าน) ---
