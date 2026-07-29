@@ -10,17 +10,17 @@
     .container { width: 100%; max-width: 600px; }
     
     /* Header */
-    .header { text-align: center; margin-bottom: 15px; }
+    .header { text-align: center; margin-bottom: 15px; position: relative; }
     .header h1 { font-size: 18px; color: #38bdf8; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .header p { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-    .btn-sync { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; float: right; margin-top: -25px; }
+    .btn-sync { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; position: absolute; right: 0; top: 0; }
     
     /* Stock Cards */
     .section-title { font-size: 13px; color: #cbd5e1; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
     .stock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
     .stock-card { background: #1e293b; border: 1px solid #7f1d1d; border-radius: 8px; padding: 10px; position: relative; }
     .stock-title { font-size: 12px; font-weight: bold; color: #f8fafc; }
-    .stock-value { font-size: 18px; font-weight: bold; margin: 6px 0; }
+    .stock-value { font-size: 18px; font-weight: bold; margin: 6px 0; color: #38bdf8; }
     .stock-badge { font-size: 10px; color: #fca5a5; background: rgba(239, 68, 68, 0.2); padding: 2px 6px; border-radius: 4px; display: inline-block; }
     
     /* Card Full Width for HP TC */
@@ -29,8 +29,9 @@
     /* Form Section */
     .form-card { background: #1e293b; border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid #334155; }
     .tab-group { display: flex; gap: 8px; margin-bottom: 15px; }
-    .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
+    .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s; }
     .tab-btn.active-out { background: #be123c; color: white; }
+    .tab-btn.active-in { background: #15803d; color: white; }
     .tab-btn.inactive { background: #0f172a; color: #94a3b8; border: 1px solid #334155; }
 
     .form-group { margin-bottom: 12px; }
@@ -51,8 +52,7 @@
     .log-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
     .tag-in { background: #15803d; color: #bbf7d0; }
     .tag-out { background: #be123c; color: #fecdd3; }
-    .log-detail { font-size: 12px; color: #f8fafc; margin-top: 2px; }
-    .log-sub { font-size: 10px; color: #64748b; }
+    .log-sub { font-size: 10px; color: #64748b; margin-top: 2px; }
     .log-qty { font-weight: bold; font-size: 13px; }
     .qty-in { color: #4ade80; }
     .qty-out { color: #f87171; }
@@ -159,22 +159,14 @@
   <div class="log-card">
     <div class="section-title">📜 ประวัติการทำรายการล่าสุด</div>
     <div id="logHistoryList">
-      <!-- ตัวอย่างรายการ -->
-      <div class="log-item">
-        <div>
-          <span class="log-tag tag-in">รับเข้า</span> <strong style="font-size: 12px; color: #fff;">น้ำมันมะพร้าว</strong>
-          <div class="log-sub">Sansiam | นำอ้อย (29/7/2569 07:58:06)</div>
-        </div>
-        <div class="log-qty qty-in">+100 ลิตร</div>
-      </div>
+      <div style="text-align:center; color:#64748b; font-size:12px; padding:10px;">กำลังโหลดข้อมูล...</div>
     </div>
   </div>
 
-  <!-- การจัดการระบบ (System Management - พร้อมระบบใส่รหัสผ่าน) -->
+  <!-- การจัดการระบบ (System Management - ล้างข้อมูลพร้อมรหัสผ่าน) -->
   <div class="admin-card">
     <div class="admin-title">⚠️ การจัดการระบบ (System Management)</div>
     
-    <!-- ส่วนลบเฉพาะรายการ -->
     <div style="margin-bottom: 8px;">
       <label style="font-size: 11px; color: #cbd5e1; display: block; margin-bottom: 4px;">ล้างข้อมูลเฉพาะชนิดน้ำมัน หรือ Line/เครื่องจักร:</label>
       <div class="admin-input-group">
@@ -185,17 +177,16 @@
 
     <div class="hr-divider"></div>
 
-    <!-- ส่วนล้างทั้งหมด -->
     <button class="btn-clear-all" onclick="clearAllDataWithPassword()">🔒 ล้างข้อมูลประวัติรับ-จ่ายน้ำมันทั้งหมด</button>
   </div>
 
 </div>
 
 <script>
-  // ⚠️ เปลี่ยน URL ตรงนี้เป็น Web App URL ของ Apps Script ของคุณมิว
+  // ⚠️ อย่าลืมตรวจสอบว่าใส่ Web App URL ของ Apps Script ถูกต้อง
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQBXdSHpcCXa5hM2asS-9w1xEwXVoPuuRUHCsjNR1k9zEKCdILqT8OslxxWsJsLVV0/exec"; 
   
-  let currentMode = 'OUT'; // ค่าเริ่มต้น: 'OUT' (จ่ายออก)
+  let currentMode = 'OUT'; // ค่าเริ่มต้น: จ่ายออก
 
   function setMode(mode) {
     currentMode = mode;
@@ -206,8 +197,7 @@
       btnOut.className = 'tab-btn active-out';
       btnIn.className = 'tab-btn inactive';
     } else {
-      btnIn.className = 'tab-btn active-out';
-      btnIn.style.background = '#15803d'; // สีเขียวสำหรับรับเข้า
+      btnIn.className = 'tab-btn active-in';
       btnOut.className = 'tab-btn inactive';
     }
   }
@@ -251,7 +241,7 @@
       if (result.status === "success") {
         alert("บันทึกข้อมูลเรียบร้อยแล้ว");
         document.getElementById('qtyInput').value = "0.00";
-        fetchData(); // ดึงข้อมูลอัปเดตใหม่
+        fetchData(); // ดึงข้อมูลใหม่เพื่ออัปเดตสต็อกทันที
       } else {
         alert("เกิดข้อผิดพลาด: " + result.message);
       }
@@ -260,18 +250,94 @@
     }
   }
 
-  // --- 2. ดึงข้อมูลประวัติและสต็อก ---
+  // --- 2. ดึงข้อมูลและคำนวณยอดสต็อกคงเหลือ ---
   async function fetchData() {
     try {
       const res = await fetch(`${SCRIPT_URL}?module=oil`);
-      const data = await res.json();
-      // อัปเดต UI ประวัติและตัวเลขสต็อกตามข้อมูลที่ได้...
+      const logs = await res.json();
+
+      const stocks = {
+        "น้ำมันมะพร้าว": 0,
+        "น้ำมันกันสนิม": 0,
+        "น้ำมัน SS75 คอลล่า": 0,
+        "น้ำมันขึ้นรูป Stamping": 0,
+        "น้ำมัน HP TC": 0
+      };
+
+      if (Array.isArray(logs) && logs.length > 0) {
+        logs.forEach(item => {
+          const oilType = item.oilType;
+          const qty = Number(item.qty) || 0;
+          const type = item.type; 
+
+          if (stocks.hasOwnProperty(oilType)) {
+            if (type === 'IN' || type === 'รับเข้า') {
+              stocks[oilType] += qty;
+            } else if (type === 'OUT' || type === 'จ่ายออก') {
+              stocks[oilType] -= qty;
+            }
+          }
+        });
+      }
+
+      // อัปเดตตัวเลขการ์ดบนหน้าจอ
+      updateStockDisplay('stock-coconut', stocks["น้ำมันมะพร้าว"]);
+      updateStockDisplay('stock-rust', stocks["น้ำมันกันสนิม"]);
+      updateStockDisplay('stock-ss75', stocks["น้ำมัน SS75 คอลล่า"]);
+      updateStockDisplay('stock-stamping', stocks["น้ำมันขึ้นรูป Stamping"]);
+      updateStockDisplay('stock-hptc', stocks["น้ำมัน HP TC"]);
+
+      // แสดงประวัติล่าสุด
+      renderLogHistory(logs);
+
     } catch (err) {
-      console.error(err);
+      console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
     }
   }
 
-  // --- 3. 🔒 ลบข้อมูลเฉพาะชนิดน้ำมัน/Line (ใส่รหัสผ่าน) ---
+  function updateStockDisplay(elementId, amount) {
+    const el = document.getElementById(elementId);
+    if (el) {
+      const displayAmount = amount < 0 ? 0 : amount;
+      el.innerHTML = `${displayAmount.toFixed(1)} <span style="font-size:12px; font-weight:normal;">ลิตร</span>`;
+    }
+  }
+
+  function renderLogHistory(logs) {
+    const container = document.getElementById("logHistoryList");
+    if (!container) return;
+
+    if (!Array.isArray(logs) || logs.length === 0) {
+      container.innerHTML = `<div style="text-align:center; color:#64748b; font-size:12px; padding:10px;">ไม่มีรายการล่าสุด</div>`;
+      return;
+    }
+
+    const recentLogs = logs.slice().reverse().slice(0, 5); 
+    
+    let html = '';
+    recentLogs.forEach(item => {
+      const isIn = item.type === 'IN' || item.type === 'รับเข้า';
+      const tagClass = isIn ? 'tag-in' : 'tag-out';
+      const qtyClass = isIn ? 'qty-in' : 'qty-out';
+      const tagText = isIn ? 'รับเข้า' : 'จ่ายออก';
+      const prefix = isIn ? '+' : '-';
+
+      html += `
+        <div class="log-item">
+          <div>
+            <span class="log-tag ${tagClass}">${tagText}</span> 
+            <strong style="font-size: 12px; color: #fff;">${item.oilType || '-'}</strong>
+            <div class="log-sub">${item.destination || '-'} | ${item.operator || '-'} (${item.timestamp || '-'})</div>
+          </div>
+          <div class="log-qty ${qtyClass}">${prefix}${Number(item.qty || 0).toFixed(0)} ลิตร</div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  // --- 3. 🔒 ลบข้อมูลเฉพาะรายการ (ใส่รหัสผ่าน) ---
   async function clearSpecificDataWithPassword() {
     const targetVal = document.getElementById("targetDeleteInput").value.trim();
     if (!targetVal) {
@@ -300,7 +366,7 @@
       const result = await res.json();
       if (result.status === 'success') {
         alert(`ลบข้อมูล "${targetVal}" เรียบร้อยแล้ว`);
-        location.reload();
+        fetchData(); // โหลดและคำนวณยอดใหม่
       } else {
         alert("ไม่สามารถลบได้: " + result.message);
       }
@@ -331,7 +397,7 @@
       const result = await res.json();
       if (result.status === 'success') {
         alert("ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว");
-        location.reload();
+        fetchData(); // รีเซ็ตยอดแสดงผลเป็น 0
       } else {
         alert("ไม่สามารถลบได้: " + result.message);
       }
@@ -339,6 +405,11 @@
       alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
     }
   }
+
+  // โหลดข้อมูลอัตโนมัติเมื่อเปิดหน้าเว็บ
+  window.onload = function() {
+    fetchData();
+  };
 </script>
 
 </body>
