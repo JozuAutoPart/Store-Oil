@@ -23,14 +23,18 @@
     .stock-card { background: #1e293b; border: 1px solid #7f1d1d; border-radius: 8px; padding: 10px; position: relative; }
     .stock-title { font-size: 12px; font-weight: bold; color: #f8fafc; }
     .stock-value { font-size: 18px; font-weight: bold; margin: 6px 0; color: #38bdf8; }
-    .stock-badge { font-size: 10px; color: #fca5a5; background: rgba(239, 68, 68, 0.2); padding: 2px 6px; border-radius: 4px; display: inline-block; }
+    
+    /* Badge Dynamic Styles */
+    .stock-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; display: inline-block; font-weight: bold; }
+    .badge-danger { color: #fca5a5; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-normal { color: #6ee7b7; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); }
     
     /* Card Full Width for HP TC */
     .stock-card.full-width { grid-column: span 2; }
 
     /* Chart Card */
     .chart-card { background: #1e293b; border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid #334155; }
-    .chart-container { position: relative; width: 100%; height: 260px; margin-top: 10px; }
+    .chart-container { position: relative; width: 100%; height: 220px; margin-top: 5px; }
 
     /* Form Section */
     .form-card { background: #1e293b; border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid #334155; }
@@ -86,42 +90,64 @@
   <!-- ยอดน้ำมันคงเหลือปัจจุบัน -->
   <div class="section-title">📊 ยอดน้ำมันคงเหลือปัจจุบัน</div>
   <div class="stock-grid">
-    <div class="stock-card">
+    <div class="stock-card" id="card-coconut">
       <div class="stock-title">🛢️ น้ำมันมะพร้าว</div>
       <div class="stock-value" id="stock-coconut">0.0 <span style="font-size:12px; font-weight:normal;">ลิตร</span></div>
-      <div class="stock-badge">⚠️ ต่ำกว่า Min Stock (50L)</div>
+      <div class="stock-badge badge-danger" id="badge-coconut">⚠️ ต่ำกว่า Min Stock (50L)</div>
     </div>
     
-    <div class="stock-card">
+    <div class="stock-card" id="card-rust">
       <div class="stock-title">🛢️ น้ำมันกันสนิม</div>
       <div class="stock-value" id="stock-rust">0.0 <span style="font-size:12px; font-weight:normal;">ลิตร</span></div>
-      <div class="stock-badge">⚠️ ต่ำกว่า Min Stock (50L)</div>
+      <div class="stock-badge badge-danger" id="badge-rust">⚠️ ต่ำกว่า Min Stock (50L)</div>
     </div>
 
-    <div class="stock-card">
+    <div class="stock-card" id="card-ss75">
       <div class="stock-title">⚙️ น้ำมัน SS75 คอลล่า</div>
       <div class="stock-value" id="stock-ss75">0.0 <span style="font-size:12px; font-weight:normal;">ลิตร</span></div>
-      <div class="stock-badge">⚠️ ต่ำกว่า Min Stock (5L)</div>
+      <div class="stock-badge badge-danger" id="badge-ss75">⚠️ ต่ำกว่า Min Stock (5L)</div>
     </div>
 
-    <div class="stock-card">
+    <div class="stock-card" id="card-stamping">
       <div class="stock-title">🏭 น้ำมันขึ้นรูป Stamping</div>
       <div class="stock-value" id="stock-stamping">0.0 <span style="font-size:12px; font-weight:normal;">ลิตร</span></div>
-      <div class="stock-badge">⚠️ ต่ำกว่า Min Stock (50L)</div>
+      <div class="stock-badge badge-danger" id="badge-stamping">⚠️ ต่ำกว่า Min Stock (50L)</div>
     </div>
 
-    <div class="stock-card full-width">
+    <div class="stock-card full-width" id="card-hptc">
       <div class="stock-title">⚡ น้ำมัน HP TC</div>
       <div class="stock-value" id="stock-hptc">0.0 <span style="font-size:12px; font-weight:normal;">ลิตร</span></div>
-      <div class="stock-badge">⚠️ ต่ำกว่า Min Stock (50L)</div>
+      <div class="stock-badge badge-danger" id="badge-hptc">⚠️ ต่ำกว่า Min Stock (50L)</div>
     </div>
   </div>
 
-  <!-- 📈 ส่วนแสดงกราฟการใช้น้ำมันแต่ละเดือน แยกตาม Line -->
+  <!-- 📈 ส่วนแสดงกราฟแยกตามชนิดน้ำมันและ Line -->
   <div class="chart-card">
-    <div class="section-title">📈 ปริมาณการใช้น้ำมันประจำเดือน (แยกตาม Line)</div>
-    <div class="chart-container">
-      <canvas id="monthlyLineChart"></canvas>
+    <div class="section-title" style="margin-bottom: 12px;">📈 ปริมาณการใช้น้ำมันแต่ละชนิด (แยกตาม Line)</div>
+    
+    <div style="margin-bottom: 15px;">
+      <div style="font-size: 12px; color: #38bdf8; font-weight: bold; margin-bottom: 4px;">🛢️ น้ำมันมะพร้าว</div>
+      <div class="chart-container"><canvas id="chartCoconut"></canvas></div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <div style="font-size: 12px; color: #38bdf8; font-weight: bold; margin-bottom: 4px;">🛢️ น้ำมันกันสนิม</div>
+      <div class="chart-container"><canvas id="chartRust"></canvas></div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <div style="font-size: 12px; color: #38bdf8; font-weight: bold; margin-bottom: 4px;">⚙️ น้ำมัน SS75 คอลล่า</div>
+      <div class="chart-container"><canvas id="chartSs75"></canvas></div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <div style="font-size: 12px; color: #38bdf8; font-weight: bold; margin-bottom: 4px;">🏭 น้ำมันขึ้นรูป Stamping</div>
+      <div class="chart-container"><canvas id="chartStamping"></canvas></div>
+    </div>
+
+    <div>
+      <div style="font-size: 12px; color: #38bdf8; font-weight: bold; margin-bottom: 4px;">⚡ น้ำมัน HP TC</div>
+      <div class="chart-container"><canvas id="chartHpTc"></canvas></div>
     </div>
   </div>
 
@@ -197,11 +223,19 @@
 </div>
 
 <script>
-  // ⚠️ อย่าลืมตรวจสอบว่าใส่ Web App URL ของ Apps Script ถูกต้อง
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQBXdSHpcCXa5hM2asS-9w1xEwXVoPuuRUHCsjNR1k9zEKCdILqT8OslxxWsJsLVV0/exec"; 
   
-  let currentMode = 'OUT'; // ค่าเริ่มต้น: จ่ายออก
-  let lineChartInstance = null; // ตัวแปรเก็บ Object กราฟ
+  let currentMode = 'OUT';
+  let chartInstances = {}; // เก็บออบเจกต์กราฟแยกตาม ID
+
+  // กำหนดค่า Min Stock ของแต่ละชนิดน้ำมัน
+  const minStocks = {
+    "น้ำมันมะพร้าว": 50,
+    "น้ำมันกันสนิม": 50,
+    "น้ำมัน SS75 คอลล่า": 5,
+    "น้ำมันขึ้นรูป Stamping": 50,
+    "น้ำมัน HP TC": 50
+  };
 
   function setMode(mode) {
     currentMode = mode;
@@ -235,7 +269,6 @@
     qtyInput.value = (currentVal + val).toFixed(2);
   }
 
-  // --- 1. บันทึกรายการลง Cloud ---
   async function submitTransaction() {
     const oilType = document.getElementById('oilTypeSelect').value;
     const qty = parseFloat(document.getElementById('qtyInput').value) || 0;
@@ -279,7 +312,6 @@
     }
   }
 
-  // --- 2. ดึงข้อมูลและคำนวณยอดสต็อกคงเหลือ + วาดกราฟ ---
   async function fetchData() {
     try {
       const res = await fetch(`${SCRIPT_URL}?module=oil`);
@@ -309,29 +341,51 @@
         });
       }
 
-      // อัปเดตตัวเลขการ์ดบนหน้าจอ
-      updateStockDisplay('stock-coconut', stocks["น้ำมันมะพร้าว"]);
-      updateStockDisplay('stock-rust', stocks["น้ำมันกันสนิม"]);
-      updateStockDisplay('stock-ss75', stocks["น้ำมัน SS75 คอลล่า"]);
-      updateStockDisplay('stock-stamping', stocks["น้ำมันขึ้นรูป Stamping"]);
-      updateStockDisplay('stock-hptc', stocks["น้ำมัน HP TC"]);
+      // อัปเดตตัวเลขและการแสดงผล Badge ตามเงื่อนไข Min Stock
+      updateStockWithBadge('coconut', stocks["น้ำมันมะพร้าว"]);
+      updateStockWithBadge('rust', stocks["น้ำมันกันสนิม"]);
+      updateStockWithBadge('ss75', stocks["น้ำมัน SS75 คอลล่า"]);
+      updateStockWithBadge('stamping', stocks["น้ำมันขึ้นรูป Stamping"]);
+      updateStockWithBadge('hptc', stocks["น้ำมัน HP TC"]);
 
-      // แสดงประวัติล่าสุด
       renderLogHistory(logs);
-
-      // สร้างและอัปเดตกราฟการใช้น้ำมันแต่ละเดือน แยกตาม Line
-      renderMonthlyLineChart(logs);
+      renderSplitOilCharts(logs);
 
     } catch (err) {
       console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
     }
   }
 
-  function updateStockDisplay(elementId, amount) {
-    const el = document.getElementById(elementId);
-    if (el) {
-      const displayAmount = amount < 0 ? 0 : amount;
-      el.innerHTML = `${displayAmount.toFixed(1)} <span style="font-size:12px; font-weight:normal;">ลิตร</span>`;
+  function updateStockWithBadge(key, amount) {
+    const valEl = document.getElementById(`stock-${key}`);
+    const badgeEl = document.getElementById(`badge-${key}`);
+    const cardEl = document.getElementById(`card-${key}`);
+
+    const displayAmount = amount < 0 ? 0 : amount;
+    const oilNameMap = {
+      'coconut': 'น้ำมันมะพร้าว',
+      'rust': 'น้ำมันกันสนิม',
+      'ss75': 'น้ำมัน SS75 คอลล่า',
+      'stamping': 'น้ำมันขึ้นรูป Stamping',
+      'hptc': 'น้ำมัน HP TC'
+    };
+    const fullName = oilNameMap[key];
+    const limit = minStocks[fullName];
+
+    if (valEl) {
+      valEl.innerHTML = `${displayAmount.toFixed(1)} <span style="font-size:12px; font-weight:normal;">ลิตร</span>`;
+    }
+
+    if (badgeEl && cardEl) {
+      if (displayAmount < limit) {
+        badgeEl.className = 'stock-badge badge-danger';
+        badgeEl.innerHTML = `⚠️ ต่ำกว่า Min Stock (${limit}L)`;
+        cardEl.style.borderColor = '#7f1d1d';
+      } else {
+        badgeEl.className = 'stock-badge badge-normal';
+        badgeEl.innerHTML = `✅ สต็อกปกติ (Min ${limit}L)`;
+        cardEl.style.borderColor = '#065f46';
+      }
     }
   }
 
@@ -369,19 +423,17 @@
     container.innerHTML = html;
   }
 
-  // --- 📈 ฟังก์ชันประมวลผลและสร้างกราฟประจำเดือนแยกตาม Line ---
-  function renderMonthlyLineChart(logs) {
+  // --- 📈 ฟังก์ชันสร้างกราฟแยกตามชนิดน้ำมันและ Line ---
+  function renderSplitOilCharts(logs) {
     if (!Array.isArray(logs) || logs.length === 0) return;
 
-    const monthlyData = {}; // { "ม.ค. 2026": { "Line 1": 50, "Line 2": 30 } }
-    const linesSet = new Set();
+    const oilDataMap = {};
     const monthsSet = new Set();
+    const oilTypes = ["น้ำมันมะพร้าว", "น้ำมันกันสนิม", "น้ำมัน SS75 คอลล่า", "น้ำมันขึ้นรูป Stamping", "น้ำมัน HP TC"];
 
-    // กรองเฉพาะรายการจ่ายออก (OUT)
     logs.forEach(item => {
       const isOut = item.type === 'OUT' || item.type === 'จ่ายออก';
-      if (isOut && item.timestamp && item.destination) {
-        // ดึงเดือน/ปี จาก timestamp (รองรับรูปแบบ 29/7/2569 หรือ YYYY-MM-DD)
+      if (isOut && item.timestamp && item.destination && item.oilType) {
         let monthKey = '';
         const parts = item.timestamp.split(' ')[0].split('/');
         if (parts.length >= 3) {
@@ -393,80 +445,87 @@
           monthKey = 'เดือนปัจจุบัน';
         }
 
+        const oilType = item.oilType.trim();
         const lineName = item.destination.trim() || 'ไม่ระบุ Line';
         const qty = Number(item.qty) || 0;
 
         monthsSet.add(monthKey);
-        linesSet.add(lineName);
 
-        if (!monthlyData[monthKey]) monthlyData[monthKey] = {};
-        if (!monthlyData[monthKey][lineName]) monthlyData[monthKey][lineName] = 0;
-        monthlyData[monthKey][lineName] += qty;
+        if (!oilDataMap[oilType]) oilDataMap[oilType] = {};
+        if (!oilDataMap[oilType][monthKey]) oilDataMap[oilType][monthKey] = {};
+        if (!oilDataMap[oilType][monthKey][lineName]) oilDataMap[oilType][monthKey][lineName] = 0;
+        
+        oilDataMap[oilType][monthKey][lineName] += qty;
       }
     });
 
-    const labels = Array.from(monthsSet); // เดือนบนแกน X
-    const lines = Array.from(linesSet);   // รายชื่อ Line ทั้งหมด
+    const labels = Array.from(monthsSet);
+    const colorPalette = ['#38bdf8', '#f43f5e', '#10b981', '#fbbf24', '#a855f7', '#ec4899', '#3b82f6', '#14b8a6'];
 
-    // พาเลตสีสวยงามสำหรับแต่ละ Line
-    const colorPalette = [
-      '#38bdf8', '#f43f5e', '#10b981', '#fbbf24', 
-      '#a855f7', '#ec4899', '#3b82f6', '#14b8a6'
-    ];
+    const canvasMapping = {
+      "น้ำมันมะพร้าว": "chartCoconut",
+      "น้ำมันกันสนิม": "chartRust",
+      "น้ำมัน SS75 คอลล่า": "chartSs75",
+      "น้ำมันขึ้นรูป Stamping": "chartStamping",
+      "น้ำมัน HP TC": "chartHpTc"
+    };
 
-    // สร้าง Dataset สำหรับ Chart.js
-    const datasets = lines.map((line, index) => {
-      return {
+    oilTypes.forEach(oilType => {
+      const canvasId = canvasMapping[oilType];
+      const ctxElement = document.getElementById(canvasId);
+      if (!ctxElement) return;
+
+      const ctx = ctxElement.getContext('2d');
+      const typeData = oilDataMap[oilType] || {};
+
+      const linesSet = new Set();
+      Object.values(typeData).forEach(monthObj => {
+        Object.keys(monthObj).forEach(line => linesSet.add(line));
+      });
+      const lines = Array.from(linesSet);
+
+      const datasets = lines.map((line, index) => ({
         label: line,
-        data: labels.map(m => monthlyData[m][line] || 0),
+        data: labels.map(m => (typeData[m] && typeData[m][line]) ? typeData[m][line] : 0),
         backgroundColor: colorPalette[index % colorPalette.length],
         borderRadius: 4
-      };
-    });
+      }));
 
-    const ctx = document.getElementById('monthlyLineChart').getContext('2d');
+      if (chartInstances[canvasId]) {
+        chartInstances[canvasId].destroy();
+      }
 
-    // ถ้ามีกราฟเดิมอยู่ให้ทำลายก่อนวาดใหม่
-    if (lineChartInstance) {
-      lineChartInstance.destroy();
-    }
-
-    lineChartInstance = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: datasets
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: { color: '#cbd5e1', font: { size: 11 } }
+      chartInstances[canvasId] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: labels, datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#cbd5e1', font: { size: 10 } } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.dataset.label}: ${ctx.raw} ลิตร`
+              }
+            }
           },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => `${ctx.dataset.label}: ${ctx.raw} ลิตร`
+          scales: {
+            x: {
+              stacked: true,
+              ticks: { color: '#94a3b8', font: { size: 9 } },
+              grid: { color: '#334155' }
+            },
+            y: {
+              stacked: true,
+              ticks: { color: '#94a3b8', font: { size: 9 } },
+              grid: { color: '#334155' }
             }
           }
-        },
-        scales: {
-          x: {
-            stacked: true,
-            ticks: { color: '#94a3b8', font: { size: 10 } },
-            grid: { color: '#334155' }
-          },
-          y: {
-            stacked: true,
-            ticks: { color: '#94a3b8', font: { size: 10 } },
-            grid: { color: '#334155' }
-          }
         }
-      }
+      });
     });
   }
 
-  // --- 3. 🔒 ลบข้อมูลเฉพาะรายการ (ใส่รหัสผ่าน) ---
   async function clearSpecificDataWithPassword() {
     const targetVal = document.getElementById("targetDeleteInput").value.trim();
     if (!targetVal) {
@@ -504,7 +563,6 @@
     }
   }
 
-  // --- 4. 🔒 ลบข้อมูลทั้งหมด (ใส่รหัสผ่าน) ---
   async function clearAllDataWithPassword() {
     const password = prompt("⚠️ คำเตือน: คุณต้องการล้างข้อมูลรับ-จ่ายน้ำมันทั้งหมด!\nกรุณากรอกรหัสผ่านยืนยัน:");
     if (password === null) return;
@@ -535,7 +593,6 @@
     }
   }
 
-  // โหลดข้อมูลอัตโนมัติเมื่อเปิดหน้าเว็บ
   window.onload = function() {
     fetchData();
   };
