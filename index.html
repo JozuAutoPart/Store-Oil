@@ -55,6 +55,12 @@
     .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
     .form-control { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 13px; }
     
+    /* Line Selection Checkbox/Radio Grid */
+    .line-options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; margin-top: 6px; }
+    .line-chip { background: #0f172a; border: 1px solid #334155; padding: 8px; border-radius: 6px; text-align: center; font-size: 12px; cursor: pointer; color: #cbd5e1; user-select: none; transition: 0.2s; }
+    .line-chip input { display: none; }
+    .line-chip.selected { background: #0284c7; border-color: #38bdf8; color: white; font-weight: bold; }
+
     .qty-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
     .btn-qty { background: #334155; border: none; color: white; padding: 8px 0; border-radius: 4px; font-size: 12px; cursor: pointer; }
     .btn-qty:hover { background: #475569; }
@@ -203,7 +209,22 @@
 
       <div class="form-group">
         <label id="lblDestination">Line / เครื่องจักรที่รับไปใช้</label>
-        <input type="text" class="form-control" id="destinationInput" placeholder="เช่น Line 1, MC-01">
+        
+        <!-- ส่วนเลือก Line แบบคลิกติ๊กเลือก -->
+        <div id="lineSelectionContainer">
+          <div class="line-options-grid">
+            <label class="line-chip" onclick="selectLine('A')"><input type="radio" name="lineRadio" value="A"> Line A</label>
+            <label class="line-chip" onclick="selectLine('spot')"><input type="radio" name="lineRadio" value="spot"> spot</label>
+            <label class="line-chip" onclick="selectLine('Q')"><input type="radio" name="lineRadio" value="Q"> Line Q</label>
+            <label class="line-chip" onclick="selectLine('C1')"><input type="radio" name="lineRadio" value="C1"> C1</label>
+            <label class="line-chip" onclick="selectLine('C2')"><input type="radio" name="lineRadio" value="C2"> C2</label>
+            <label class="line-chip" onclick="selectLine('C3')"><input type="radio" name="lineRadio" value="C3"> C3</label>
+            <label class="line-chip" onclick="selectLine('แพ็คติ้ง')"><input type="radio" name="lineRadio" value="แพ็คติ้ง"> แพ็คติ้ง</label>
+          </div>
+        </div>
+
+        <!-- ช่องกรอกข้อความ (ใช้เมื่อโหมดรับเข้า หรือเลือกพิมพ์เอง) -->
+        <input type="text" class="form-control" id="destinationInput" placeholder="เช่น Line 1, MC-01" style="margin-top: 8px;">
       </div>
 
       <div class="form-group">
@@ -249,7 +270,6 @@
   let lineChartInstance = null;
   let chartInstances = {};
 
-  // กำหนดสีมาตรฐานสำหรับแต่ละ Line ให้ใช้สีเดียวกันทั้งหน้าเว็บ
   const lineColorMap = {
     'A': '#38bdf8',      // ฟ้า
     'spot': '#f43f5e',   // แดง/ชมพูเข้ม
@@ -280,6 +300,23 @@
     "น้ำมัน HP TC": 50
   };
 
+  function selectLine(lineName) {
+    document.getElementById('destinationInput').value = lineName;
+    
+    // เปลี่ยนสไตล์ปุ่มที่เลือก
+    const chips = document.querySelectorAll('.line-chip');
+    chips.forEach(chip => {
+      const radio = chip.querySelector('input');
+      if (radio.value === lineName) {
+        radio.checked = true;
+        chip.classList.add('selected');
+      } else {
+        radio.checked = false;
+        chip.classList.remove('selected');
+      }
+    });
+  }
+
   function setMode(mode) {
     currentMode = mode;
     const btnOut = document.getElementById('btn-mode-out');
@@ -287,19 +324,22 @@
     const lblDestination = document.getElementById('lblDestination');
     const lblOperator = document.getElementById('lblOperator');
     const destinationInput = document.getElementById('destinationInput');
+    const lineSelectionContainer = document.getElementById('lineSelectionContainer');
     const operatorInput = document.getElementById('operatorInput');
     
     if (mode === 'OUT') {
       btnOut.className = 'tab-btn active-out';
       btnIn.className = 'tab-btn inactive';
-      lblDestination.innerText = 'Line / เครื่องจักรที่รับไปใช้';
-      destinationInput.placeholder = 'เช่น Line 1, MC-01';
+      lblDestination.innerText = 'Line / เครื่องจักรที่รับไปใช้ (เลือกหรือพิมพ์ระบุ)';
+      lineSelectionContainer.style.display = 'block';
+      destinationInput.placeholder = 'หรือพิมพ์ระบุ เช่น MC-01';
       lblOperator.innerText = 'ผู้เบิก';
       operatorInput.placeholder = 'ชื่อผู้เบิกน้ำมัน';
     } else {
       btnIn.className = 'tab-btn active-in';
       btnOut.className = 'tab-btn inactive';
       lblDestination.innerText = 'ชื่อ Supplier';
+      lineSelectionContainer.style.display = 'none';
       destinationInput.placeholder = 'เช่น PTT, Shell, Sansiam';
       lblOperator.innerText = 'ผู้รับน้ำมัน';
       operatorInput.placeholder = 'ชื่อผู้รับน้ำมันเข้า Store';
@@ -320,6 +360,10 @@
 
     if (qty <= 0) {
       alert("กรุณาระบุจำนวนลิตรให้ถูกต้อง");
+      return;
+    }
+    if (!destination) {
+      alert("กรุณาระบุ Line หรือ Supplier");
       return;
     }
 
@@ -345,6 +389,8 @@
         alert("บันทึกข้อมูลเรียบร้อยแล้ว");
         document.getElementById('qtyInput').value = "0.00";
         document.getElementById('destinationInput').value = "";
+        document.querySelectorAll('.line-chip').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('input[name="lineRadio"]').forEach(r => r.checked = false);
         document.getElementById('operatorInput').value = "";
         fetchData(); 
       } else {
@@ -535,7 +581,7 @@
           legend: { 
             labels: { 
               color: '#f8fafc', 
-              font: { size: 14, weight: 'bold' }, // ขยายขนาดตัวอักษร Legend ใหญ่ขึ้น
+              font: { size: 14, weight: 'bold' },
               boxWidth: 18,
               padding: 15
             } 
@@ -642,7 +688,7 @@
             legend: { 
               labels: { 
                 color: '#f8fafc', 
-                font: { size: 11, weight: 'bold' }, // ขยายขนาด Legend กราฟย่อยให้ใหญ่ขึ้นเล็กน้อย
+                font: { size: 11, weight: 'bold' },
                 boxWidth: 12
               } 
             },
