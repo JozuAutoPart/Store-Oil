@@ -167,13 +167,13 @@
     <div class="stock-card" id="card-coconut">
       <div class="stock-title">🛢️ น้ำมันมะพร้าว</div>
       <div class="stock-value" id="stock-coconut">0.0 <span style="font-size:12px; font-weight:normal;">ลิตร</span></div>
-      <div class="stock-badge badge-danger" id="badge-coconut">⚠️ ต่ำกว่า Min Stock (50L)</div>
+      <div class="stock-badge badge-danger" id="badge-coconut">⚠️ ต่ำกว่า Min Stock (30L)</div>
     </div>
     
     <div class="stock-card" id="card-rust">
       <div class="stock-title">🛢️ น้ำมันกันสนิม</div>
       <div class="stock-value" id="stock-rust">0.0 <span style="font-size:12px; font-weight:normal;">ลิตร</span></div>
-      <div class="stock-badge badge-danger" id="badge-rust">⚠️ ต่ำกว่า Min Stock (50L)</div>
+      <div class="stock-badge badge-danger" id="badge-rust">⚠️ ต่ำกว่า Min Stock (30L)</div>
     </div>
 
     <div class="stock-card" id="card-ss75">
@@ -235,7 +235,7 @@
   <div class="main-grid">
     <!-- ฟอร์มลงบันทึก รับเข้า / จ่ายออก -->
     <div class="form-card">
-      <div class="section-title" style="margin-bottom: 12px; color: #38bdf8; font-size: 15px;">📑 ลงบันทึก รับเข้า / จ่ายออก</div>
+      <div class="section-title" style="margin-bottom: 12px; color: #38bdf8; font-size: 20px;">📑 ลงบันทึก รับเข้า / จ่ายออก</div>
       
       <div class="tab-group">
         <button class="tab-btn active-out" id="btn-mode-out" onclick="setMode('OUT')">🔴 จ่ายออก</button>
@@ -245,8 +245,8 @@
       <div class="form-group">
         <label>เลือกชนิดน้ำมัน</label>
         <select class="form-control" id="oilTypeSelect">
-          <option value="น้ำมันมะพร้าว">1. น้ำมันมะพร้าว (Min 50L)</option>
-          <option value="น้ำมันกันสนิม">2. น้ำมันกันสนิม (Min 50L)</option>
+          <option value="น้ำมันมะพร้าว">1. น้ำมันมะพร้าว (Min 30L)</option>
+          <option value="น้ำมันกันสนิม">2. น้ำมันกันสนิม (Min 30L)</option>
           <option value="น้ำมัน SS75 คอลล่า">3. น้ำมัน SS75 คอลล่า (Min 5L)</option>
           <option value="น้ำมันขึ้นรูป Stamping">4. น้ำมันขึ้นรูป Stamping (Min 50L)</option>
           <option value="น้ำมัน HP TC">5. น้ำมัน HP TC (Min 50L)</option>
@@ -271,12 +271,12 @@
         <div id="lineSelectionContainer">
           <div class="line-options-grid">
             <label class="line-chip" onclick="selectLine('A')"><input type="radio" name="lineRadio" value="A"> Line A</label>
-            <label class="line-chip" onclick="selectLine('spot')"><input type="radio" name="lineRadio" value="spot"> spot</label>
+            <label class="line-chip" onclick="selectLine('Spot')"><input type="radio" name="lineRadio" value="Spot"> Spot</label>
             <label class="line-chip" onclick="selectLine('Q')"><input type="radio" name="lineRadio" value="Q"> Line Q</label>
             <label class="line-chip" onclick="selectLine('C1')"><input type="radio" name="lineRadio" value="C1"> C1</label>
             <label class="line-chip" onclick="selectLine('C2')"><input type="radio" name="lineRadio" value="C2"> C2</label>
             <label class="line-chip" onclick="selectLine('C3')"><input type="radio" name="lineRadio" value="C3"> C3</label>
-            <label class="line-chip" onclick="selectLine('แพ็คติ้ง')"><input type="radio" name="lineRadio" value="แพ็คติ้ง"> แพ็คติ้ง</label>
+            <label class="line-chip" onclick="selectLine('Q-Gate')"><input type="radio" name="lineRadio" value="Q-Gate"> Q-Gate</label>
           </div>
         </div>
 
@@ -329,12 +329,12 @@
 
   const lineColorMap = {
     'A': '#38bdf8',      // ฟ้า
-    'spot': '#f43f5e',   // แดง/ชมพูเข้ม
+    'Spot': '#f43f5e',   // แดง/ชมพูเข้ม
     'Q': '#10b981',      // เขียว
     'C1': '#fbbf24',     // เหลือง
     'C2': '#a855f7',     // ม่วง
     'C3': '#ec4899',     // ชมพู
-    'แพ็คติ้ง': '#3b82f6' // น้ำเงิน
+    'Q-Gate': '#3b82f6' // น้ำเงิน
   };
 
   const defaultColorPalette = [
@@ -350,8 +350,8 @@
   }
 
   const minStocks = {
-    "น้ำมันมะพร้าว": 50,
-    "น้ำมันกันสนิม": 50,
+    "น้ำมันมะพร้าว": 30,
+    "น้ำมันกันสนิม": 30,
     "น้ำมัน SS75 คอลล่า": 5,
     "น้ำมันขึ้นรูป Stamping": 50,
     "น้ำมัน HP TC": 50
