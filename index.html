@@ -11,9 +11,11 @@
     body { background-color: #0f172a; color: #f8fafc; padding: 15px; }
     .container { width: 100%; max-width: 100%; margin: 0 auto; }
     
-    /* Header - เพิ่มขนาดตัวอักษรให้ใหญ่ขึ้น */
+    /* Header & Logo */
     .header { text-align: center; margin-bottom: 25px; position: relative; padding-top: 5px; }
-    .header h1 { font-size: 34px; color: #38bdf8; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; }
+    .header-content { display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .logo-img { height: 50px; width: auto; object-fit: contain; }
+    .header h1 { font-size: 34px; color: #38bdf8; font-weight: bold; margin: 0; }
     .header p { font-size: 15px; color: #94a3b8; margin-top: 6px; }
     .btn-sync { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; position: absolute; right: 10px; top: 5px; }
     
@@ -89,7 +91,10 @@
   <!-- Header -->
   <div class="header">
     <button class="btn-sync" onclick="fetchData()">🔄 ดึงข้อมูล</button>
-    <h1>Jozu Oil Store</h1>
+    <div class="header-content">
+      <img src="Jozu%20Auto%20Part.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+      <h1>Jozu Oil Store</h1>
+    </div>
     <p>ระบบควบคุมสต็อกน้ำมันผ่านมือถือและเดสก์ท็อป</p>
   </div>
 
@@ -459,242 +464,4 @@
           monthKey = 'เดือนปัจจุบัน';
         }
 
-        const lineName = item.destination.trim() || 'ไม่ระบุ Line';
-        const qty = Number(item.qty) || 0;
-
-        monthsSet.add(monthKey);
-        linesSet.add(lineName);
-
-        if (!monthlyData[monthKey]) monthlyData[monthKey] = {};
-        if (!monthlyData[monthKey][lineName]) monthlyData[monthKey][lineName] = 0;
-        monthlyData[monthKey][lineName] += qty;
-      }
-    });
-
-    const labels = Array.from(monthsSet);
-    const lines = Array.from(linesSet);  
-
-    const colorPalette = [
-      '#38bdf8', '#f43f5e', '#10b981', '#fbbf24', 
-      '#a855f7', '#ec4899', '#3b82f6', '#14b8a6'
-    ];
-
-    const datasets = lines.map((line, index) => ({
-      label: line,
-      data: labels.map(m => monthlyData[m][line] || 0),
-      backgroundColor: colorPalette[index % colorPalette.length],
-      borderRadius: 4
-    }));
-
-    const ctx = document.getElementById('monthlyLineChart').getContext('2d');
-
-    if (lineChartInstance) {
-      lineChartInstance.destroy();
-    }
-
-    lineChartInstance = new Chart(ctx, {
-      type: 'bar',
-      data: { labels: labels, datasets: datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { labels: { color: '#cbd5e1', font: { size: 11 } } },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => `${ctx.dataset.label}: ${ctx.raw} ลิตร`
-            }
-          }
-        },
-        scales: {
-          x: {
-            stacked: true,
-            ticks: { color: '#94a3b8', font: { size: 11 } },
-            grid: { color: '#334155' }
-          },
-          y: {
-            stacked: true,
-            ticks: { color: '#94a3b8', font: { size: 11 } },
-            grid: { color: '#334155' }
-          }
-        }
-      }
-    });
-  }
-
-  function renderSplitOilCharts(logs) {
-    if (!Array.isArray(logs) || logs.length === 0) return;
-
-    const oilDataMap = {};
-    const monthsSet = new Set();
-    const oilTypes = ["น้ำมันมะพร้าว", "น้ำมันกันสนิม", "น้ำมัน SS75 คอลล่า", "น้ำมันขึ้นรูป Stamping", "น้ำมัน HP TC"];
-
-    logs.forEach(item => {
-      const isOut = item.type === 'OUT' || item.type === 'จ่ายออก';
-      if (isOut && item.timestamp && item.destination && item.oilType) {
-        let monthKey = '';
-        const parts = item.timestamp.split(' ')[0].split('/');
-        if (parts.length >= 3) {
-          const monthNames = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-          const mIdx = parseInt(parts[1], 10) - 1;
-          const monthStr = monthNames[mIdx] || parts[1];
-          monthKey = `${monthStr} ${parts[2]}`;
-        } else {
-          monthKey = 'เดือนปัจจุบัน';
-        }
-
-        const oilType = item.oilType.trim();
-        const lineName = item.destination.trim() || 'ไม่ระบุ Line';
-        const qty = Number(item.qty) || 0;
-
-        monthsSet.add(monthKey);
-
-        if (!oilDataMap[oilType]) oilDataMap[oilType] = {};
-        if (!oilDataMap[oilType][monthKey]) oilDataMap[oilType][monthKey] = {};
-        if (!oilDataMap[oilType][monthKey][lineName]) oilDataMap[oilType][monthKey][lineName] = 0;
-        
-        oilDataMap[oilType][monthKey][lineName] += qty;
-      }
-    });
-
-    const labels = Array.from(monthsSet);
-    const colorPalette = ['#38bdf8', '#f43f5e', '#10b981', '#fbbf24', '#a855f7', '#ec4899', '#3b82f6', '#14b8a6'];
-
-    const canvasMapping = {
-      "น้ำมันมะพร้าว": "chartCoconut",
-      "น้ำมันกันสนิม": "chartRust",
-      "น้ำมัน SS75 คอลล่า": "chartSs75",
-      "น้ำมันขึ้นรูป Stamping": "chartStamping",
-      "น้ำมัน HP TC": "chartHpTc"
-    };
-
-    oilTypes.forEach(oilType => {
-      const canvasId = canvasMapping[oilType];
-      const ctxElement = document.getElementById(canvasId);
-      if (!ctxElement) return;
-
-      const ctx = ctxElement.getContext('2d');
-      const typeData = oilDataMap[oilType] || {};
-
-      const linesSet = new Set();
-      Object.values(typeData).forEach(monthObj => {
-        Object.keys(monthObj).forEach(line => linesSet.add(line));
-      });
-      const lines = Array.from(linesSet);
-
-      const datasets = lines.map((line, index) => ({
-        label: line,
-        data: labels.map(m => (typeData[m] && typeData[m][line]) ? typeData[m][line] : 0),
-        backgroundColor: colorPalette[index % colorPalette.length],
-        borderRadius: 4
-      }));
-
-      if (chartInstances[canvasId]) {
-        chartInstances[canvasId].destroy();
-      }
-
-      chartInstances[canvasId] = new Chart(ctx, {
-        type: 'bar',
-        data: { labels: labels, datasets: datasets },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: '#cbd5e1', font: { size: 10 } } },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => `${ctx.dataset.label}: ${ctx.raw} ลิตร`
-              }
-            }
-          },
-          scales: {
-            x: {
-              stacked: true,
-              ticks: { color: '#94a3b8', font: { size: 10 } },
-              grid: { color: '#334155' }
-            },
-            y: {
-              stacked: true,
-              ticks: { color: '#94a3b8', font: { size: 10 } },
-              grid: { color: '#334155' }
-            }
-          }
-        }
-      });
-    });
-  }
-
-  async function clearSpecificDataWithPassword() {
-    const targetVal = document.getElementById("targetDeleteInput").value.trim();
-    if (!targetVal) {
-      alert("กรุณาระบุชนิดน้ำมัน หรือ Line/เครื่องจักร/Supplier ที่ต้องการลบก่อนครับ");
-      return;
-    }
-
-    const password = prompt(`คุณกำลังจะลบประวัติของ: "${targetVal}"\nกรุณากรอกรหัสผ่านเพื่อยืนยัน:`);
-    if (password === null) return;
-    if (!password.trim()) {
-      alert("กรุณากรอกรหัสผ่าน");
-      return;
-    }
-
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: 'clearSpecificOilData',
-          target: targetVal,
-          password: password
-        })
-      });
-
-      const result = await res.json();
-      if (result.status === 'success') {
-        alert(`ลบข้อมูล "${targetVal}" เรียบร้อยแล้ว`);
-        fetchData();
-      } else {
-        alert("ไม่สามารถลบได้: " + result.message);
-      }
-    } catch (err) {
-      alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
-    }
-  }
-
-  async function clearAllDataWithPassword() {
-    const password = prompt("⚠️ คำเตือน: คุณต้องการล้างข้อมูลรับ-จ่ายน้ำมันทั้งหมด!\nกรุณากรอกรหัสผ่านยืนยัน:");
-    if (password === null) return;
-    if (!password.trim()) {
-      alert("กรุณากรอกรหัสผ่าน");
-      return;
-    }
-
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: 'clearOilData',
-          password: password
-        })
-      });
-
-      const result = await res.json();
-      if (result.status === 'success') {
-        alert("ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว");
-        fetchData();
-      } else {
-        alert("ไม่สามารถลบได้: " + result.message);
-      }
-    } catch (err) {
-      alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
-    }
-  }
-
-  window.onload = function() {
-    fetchData();
-  };
-</script>
-
-</body>
-</html>
+        const lineName = item.destination.trim() || 'ไม่ระบุ
